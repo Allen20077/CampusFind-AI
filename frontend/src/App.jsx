@@ -11,6 +11,8 @@ const [showPassword, setShowPassword] = useState(false);
   const [reports, setReports] = useState([]);
 const [searchQuery, setSearchQuery] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
+  const [showRecoverConfirm, setShowRecoverConfirm] = useState(false);
+const [recoverReportId, setRecoverReportId] = useState(null);
   const [user, setUser] = useState(null);
 
 const [loginEmail, setLoginEmail] = useState("");
@@ -198,6 +200,10 @@ setSubmitted(true);
     }
   };
 const filteredReports = reports.filter((report) => {
+  if (report.status !== "active") {
+    return false;
+  }
+
   const query = searchQuery.toLowerCase().trim();
 
   if (!query) return false;
@@ -210,33 +216,54 @@ const filteredReports = reports.filter((report) => {
     report.description?.toLowerCase().includes(query)
   );
 });
-  const handleLogin = async (e) => {
-  e.preventDefault();
+const handleRecover = (reportId) => {
+  setRecoverReportId(reportId);
+  setShowRecoverConfirm(true);
+};
 
-  setAuthLoading(true);
-  setAuthMessage("");
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: loginEmail,
-    password: loginPassword,
-  });
-
-  setAuthLoading(false);
-
-  if (error) {
-    setAuthMessage(error.message);
+const confirmRecover = async () => {
+  if (!recoverReportId) {
     return;
   }
 
-  // Login successful
-  setUser(data.user);
+  try {
+    const API_URL =
+      import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-  // Close login page
-  setShowLogin(false);
+    const response = await fetch(
+      `${API_URL}/api/reports/${recoverReportId}/recover`,
+      {
+        method: "PATCH",
+      }
+    );
 
-  // Clear login fields
-  setLoginEmail("");
-  setLoginPassword("");
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.detail || "Failed to mark item as recovered."
+      );
+    }
+
+    console.log("ITEM RECOVERED:", result);
+
+    setReports((previousReports) =>
+      previousReports.filter(
+        (report) => report.id !== recoverReportId
+      )
+    );
+
+    setSelectedReport(null);
+    setShowRecoverConfirm(false);
+    setRecoverReportId(null);
+
+  } catch (error) {
+    console.error("RECOVER ERROR:", error);
+
+    window.alert(
+      error.message || "Failed to mark item as recovered."
+    );
+  }
 };
   return (
     <div className="app">
@@ -598,8 +625,9 @@ const filteredReports = reports.filter((report) => {
   </div>
 
   <div className="items-grid">
-{reports.length > 0 ? (
+{reports.filter((report) => report.status === "active").length > 0 ? (
   [...reports]
+    .filter((report) => report.status === "active")
     .sort((a, b) => {
       const dateA = new Date(`${a.date}T${a.time || "00:00"}`);
       const dateB = new Date(`${b.date}T${b.time || "00:00"}`);
@@ -722,7 +750,59 @@ const filteredReports = reports.filter((report) => {
         <div className="details-no-image">
           📦
         </div>
-      )}
+            )}
+            {showRecoverConfirm && (
+  <div
+    className="recover-overlay"
+    onClick={() => {
+      setShowRecoverConfirm(false);
+      setRecoverReportId(null);
+    }}
+  >
+    <div
+      className="recover-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+
+      <div className="recover-icon">
+        ✓
+      </div>
+
+      <h2>Mark as Recovered?</h2>
+
+      <p>
+        Has the owner received this item?
+      </p>
+
+      <span>
+        Once recovered, the item will be removed from
+        active Lost & Found and its photo will be permanently deleted.
+      </span>
+
+      <div className="recover-actions">
+
+        <button
+          className="recover-cancel"
+          onClick={() => {
+            setShowRecoverConfirm(false);
+            setRecoverReportId(null);
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          className="recover-confirm"
+          onClick={confirmRecover}
+        >
+          ✓ Yes, Recovered
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
 
       <span
         className={`item-status ${
@@ -775,7 +855,15 @@ const filteredReports = reports.filter((report) => {
         <div className="details-contact">
           <strong>📞 Contact</strong>
           <p>{selectedReport.contact}</p>
-        </div>
+              </div>
+              {selectedReport.status === "active" && (
+  <button
+    className="recover-btn"
+    onClick={() => handleRecover(selectedReport.id)}
+  >
+    ✅ Mark as Recovered
+  </button>
+)}
 
       </div>
 

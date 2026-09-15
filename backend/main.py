@@ -348,3 +348,107 @@ def get_reports():
             status_code=500,
             detail=f"Failed to load reports: {str(e)}"
         )
+        
+        # =========================================================
+# MARK REPORT AS RECOVERED + DELETE PHOTO
+# =========================================================
+
+@app.patch("/api/reports/{report_id}/recover")
+def recover_report(report_id: str):
+    try:
+
+        # Find the report
+        report_result = (
+            supabase
+            .table("reports")
+            .select("*")
+            .eq("id", report_id)
+            .execute()
+        )
+
+        if not report_result.data:
+            raise HTTPException(
+                status_code=404,
+                detail="Report not found."
+            )
+
+        report = report_result.data[0]
+
+        # Get photo path
+        photo_path = report.get("photo_path")
+
+        # Delete photo from Supabase Storage
+        if photo_path:
+
+            storage_url = (
+                f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/"
+                f"{SUPABASE_BUCKET}/{photo_path.lstrip('/')}"
+            )
+
+            headers = {
+                "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            }
+
+            delete_response = requests.delete(
+                storage_url,
+                headers=headers,
+                timeout=60,
+            )
+
+            print(
+                "PHOTO DELETE STATUS:",
+                delete_response.status_code
+            )
+
+            if not delete_response.ok:
+                print(
+                    "PHOTO DELETE ERROR:",
+                    delete_response.text
+                )
+
+                raise HTTPException(
+                    status_code=500,
+                    detail="Failed to delete item photo."
+                )
+
+            print(
+                f"PHOTO PERMANENTLY DELETED: {photo_path}"
+            )
+
+        # Mark report as recovered
+        update_result = (
+            supabase
+            .table("reports")
+            .update({
+                "status": "recovered",
+                "photo_path": None,
+            })
+            .eq("id", report_id)
+            .execute()
+        )
+
+        if not update_result.data:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to update report status."
+            )
+
+        return {
+            "success": True,
+            "message": "Item recovered and photo permanently deleted.",
+            "report": update_result.data[0],
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+
+        print("RECOVER REPORT ERROR:")
+        print(repr(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to recover item: {str(e)}"
+        )
