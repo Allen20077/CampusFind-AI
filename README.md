@@ -2,97 +2,96 @@
 
 <p align="center">
 
-  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
-  <img src="https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
-  <img src="https://img.shields.io/badge/Supabase-Database%20%26%20Storage-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
-  <img src="https://img.shields.io/badge/Vite-Frontend-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
-  <img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
+<img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
+<img src="https://img.shields.io/badge/Vite-Frontend-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+<img src="https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
+<img src="https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+<img src="https://img.shields.io/badge/Supabase-Database%20%26%20Storage-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
+<img src="https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+<img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" />
 
 </p>
 
 <p align="center">
-  <b>A modern digital Lost & Found platform designed specifically for university campuses.</b>
+  <strong>A modern digital Lost & Found platform built for university campuses.</strong>
 </p>
 
 <p align="center">
-  Report lost items • Report found items • Search instantly • View item details • Recover items
+  Report Lost Items • Report Found Items • Search • Upload Photos • Recover Items
 </p>
 
 ---
 
-## 🚀 Overview
+## 🌐 Live Application
 
-**CampusFind AI** is a full-stack campus Lost & Found platform designed to make recovering misplaced belongings faster, simpler, and more organized.
+### 🚀 Frontend
 
-Traditional campus Lost & Found systems often depend on physical notice boards, WhatsApp groups, word-of-mouth communication, or manually maintained records.
+https://campusfind-ai-ten.vercel.app
 
-CampusFind AI brings the entire process into one centralized web application.
+### ⚡ Backend API
 
-Students can:
-
-- 🔴 Report items they have lost
-- 🟢 Report items they have found
-- 🔎 Search reported items
-- 📍 View where an item was lost or found
-- 🖼️ Upload item photographs
-- 📞 Access the available contact information
-- ✅ Mark items as recovered
-- 🗑️ Permanently remove recovered item photographs from storage
-
-The platform uses a **React frontend**, **FastAPI backend**, and **Supabase database + object storage**.
+https://campus-find-ai-kappa.vercel.app
 
 ---
 
-# ✨ Key Features
+# 📌 About The Project
 
-## 🔴 Lost Item Reporting
+**CampusFind AI** is a full-stack digital Lost & Found platform designed to help students quickly report, search for, identify, and recover misplaced belongings on campus.
 
-Students can submit detailed lost-item reports including:
+Traditional campus Lost & Found systems often depend on:
 
-- Item name
-- Category
-- Colour
-- Location
-- Date
-- Time
-- Description
-- Contact information
-- Photograph
+- WhatsApp groups
+- Physical notice boards
+- Word of mouth
+- Manual records
+- Scattered social media posts
 
----
+This makes it difficult for students to find the right information at the right time.
 
-## 🟢 Found Item Reporting
+CampusFind brings the process into a **single centralized platform**.
 
-Users who discover an item can publish a Found Item report containing the same information.
-
-This allows the owner to search the platform and identify their belongings.
+Users can report lost or found items, upload photographs, search existing reports, view item information, and mark successfully returned items as recovered.
 
 ---
 
-## 🔎 Smart Search
+# 🎯 Problem Statement
 
-CampusFind provides fast client-side searching across:
+Students frequently lose personal belongings such as:
 
-- Item name
-- Category
-- Colour
-- Location
-- Description
+- ID cards
+- Wallets
+- Keys
+- Earphones
+- Chargers
+- Books
+- Bags
+- Watches
+- Water bottles
+- Electronic devices
 
-Recovered items are automatically excluded from active search results.
+The biggest challenge is not necessarily finding the physical item — it is **connecting the item with its owner**.
+
+CampusFind solves this by creating a structured digital database of Lost and Found reports.
 
 ---
 
-## 🖼️ Image Upload & Storage
+# 💡 Solution
 
-Item photographs are uploaded to **Supabase Storage**.
-
-Each report stores the corresponding storage path in the database.
-
-This separates:
+CampusFind provides a centralized system where:
 
 ```text
-Report Metadata
-       +
-Item Photograph
+Student loses an item
+        ↓
+Reports the item
+        ↓
+Photo + Details stored
+        ↓
+Other users can search
+        ↓
+Potential owner identifies item
+        ↓
+Contact information
+        ↓
+Item is returned
+        ↓
+Report marked as Recovered
