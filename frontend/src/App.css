@@ -1428,8 +1428,8 @@ footer {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1545,4 +1545,22 @@ footer {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
+}
+
+.auth-message {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    background: #fff1f1;
+    border: 1px solid #f0b8b8;
+    color: #b42318;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.login-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }

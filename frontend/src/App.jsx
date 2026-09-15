@@ -14,7 +14,14 @@ const [searchQuery, setSearchQuery] = useState("");
   const [showRecoverConfirm, setShowRecoverConfirm] = useState(false);
 const [recoverReportId, setRecoverReportId] = useState(null);
   const [user, setUser] = useState(null);
+const [showRegister, setShowRegister] = useState(false);
 
+const [registerName, setRegisterName] = useState("");
+const [registerEmail, setRegisterEmail] = useState("");
+const [registerPassword, setRegisterPassword] = useState("");
+const [registerConfirmPassword, setRegisterConfirmPassword] = useState("");
+
+const [registerLoading, setRegisterLoading] = useState(false);
 const [loginEmail, setLoginEmail] = useState("");
 const [loginPassword, setLoginPassword] = useState("");
 
@@ -35,7 +42,27 @@ const [authMessage, setAuthMessage] = useState("");
   const [photo, setPhoto] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+useEffect(() => {
+  const loadUser = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
+    setUser(user);
+  };
+
+  loadUser();
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setUser(session?.user ?? null);
+  });
+
+  return () => {
+    subscription.unsubscribe();
+  };
+}, []);
   useEffect(() => {
     const API_URL =
       import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
@@ -199,70 +226,187 @@ setSubmitted(true);
       setSubmitting(false);
     }
   };
-const filteredReports = reports.filter((report) => {
-  if (report.status !== "active") {
-    return false;
+
+  const filteredReports = reports.filter((report) => {
+    if (report.status !== "active") {
+      return false;
+    }
+
+    const query = searchQuery.toLowerCase().trim();
+
+    if (!query) return false;
+
+    return (
+      report.item_name?.toLowerCase().includes(query) ||
+      report.category?.toLowerCase().includes(query) ||
+      report.colour?.toLowerCase().includes(query) ||
+      report.location?.toLowerCase().includes(query) ||
+      report.description?.toLowerCase().includes(query)
+    );
+  });
+
+  const handleRecover = (reportId) => {
+    setRecoverReportId(reportId);
+    setShowRecoverConfirm(true);
+  };
+
+  const confirmRecover = async () => {
+    if (!recoverReportId) return;
+
+    try {
+      const API_URL =
+        import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+      const response = await fetch(
+        `${API_URL}/api/reports/${recoverReportId}/recover`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          result.detail || "Failed to mark item as recovered."
+        );
+      }
+
+      console.log("ITEM RECOVERED:", result);
+
+      setReports((previousReports) =>
+        previousReports.filter(
+          (report) => report.id !== recoverReportId
+        )
+      );
+
+      setSelectedReport(null);
+      setShowRecoverConfirm(false);
+      setRecoverReportId(null);
+    } catch (error) {
+      console.error("RECOVER ERROR:", error);
+      window.alert(
+        error.message || "Failed to mark item as recovered."
+      );
+    }
+  };
+
+  const handleLogin = async (e) => {
+  e.preventDefault();
+
+  setAuthLoading(true);
+  setAuthMessage("");
+
+  try {
+    const { data, error } =
+      await supabase.auth.signInWithPassword({
+        email: loginEmail.trim(),
+        password: loginPassword,
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    setUser(data.user);
+
+    setShowLogin(false);
+
+    setLoginEmail("");
+    setLoginPassword("");
+    setShowPassword(false);
+    setAuthMessage("");
+
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+
+    setAuthMessage(
+      error.message ||
+        "Login failed. Please check your email and password."
+    );
+
+  } finally {
+    setAuthLoading(false);
+  }
+  };
+  const handleLogout = async () => {
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    console.error("LOGOUT ERROR:", error);
+    return;
   }
 
-  const query = searchQuery.toLowerCase().trim();
+  setUser(null);
+  };
+  const handleRegister = async (e) => {
+  e.preventDefault();
 
-  if (!query) return false;
+  setRegisterLoading(true);
+  setAuthMessage("");
 
-  return (
-    report.item_name?.toLowerCase().includes(query) ||
-    report.category?.toLowerCase().includes(query) ||
-    report.colour?.toLowerCase().includes(query) ||
-    report.location?.toLowerCase().includes(query) ||
-    report.description?.toLowerCase().includes(query)
-  );
-});
-const handleRecover = (reportId) => {
-  setRecoverReportId(reportId);
-  setShowRecoverConfirm(true);
-};
+  const email = registerEmail.trim().toLowerCase();
 
-const confirmRecover = async () => {
-  if (!recoverReportId) {
+  if (!email.endsWith("christuniversity.in")) {
+    setAuthMessage(
+      "Please use your CHRIST University email address."
+    );
+    setRegisterLoading(false);
+    return;
+  }
+
+  if (registerPassword.length < 6) {
+    setAuthMessage(
+      "Password must be at least 6 characters."
+    );
+    setRegisterLoading(false);
+    return;
+  }
+
+  if (registerPassword !== registerConfirmPassword) {
+    setAuthMessage(
+      "Passwords do not match."
+    );
+    setRegisterLoading(false);
     return;
   }
 
   try {
-    const API_URL =
-      import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+    const { data, error } =
+      await supabase.auth.signUp({
+        email,
+        password: registerPassword,
+        options: {
+          data: {
+            full_name: registerName.trim(),
+          },
+        },
+      });
 
-    const response = await fetch(
-      `${API_URL}/api/reports/${recoverReportId}/recover`,
-      {
-        method: "PATCH",
-      }
-    );
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        result.detail || "Failed to mark item as recovered."
-      );
+    if (error) {
+      throw error;
     }
 
-    console.log("ITEM RECOVERED:", result);
+    setUser(data.user);
 
-    setReports((previousReports) =>
-      previousReports.filter(
-        (report) => report.id !== recoverReportId
-      )
-    );
+    setShowRegister(false);
+    setShowLogin(false);
 
-    setSelectedReport(null);
-    setShowRecoverConfirm(false);
-    setRecoverReportId(null);
+    setRegisterName("");
+    setRegisterEmail("");
+    setRegisterPassword("");
+    setRegisterConfirmPassword("");
+    setAuthMessage("");
 
   } catch (error) {
-    console.error("RECOVER ERROR:", error);
+    console.error("REGISTER ERROR:", error);
 
-    window.alert(
-      error.message || "Failed to mark item as recovered."
+    setAuthMessage(
+      error.message ||
+      "Registration failed. Please try again."
     );
+  } finally {
+    setRegisterLoading(false);
   }
 };
   return (
@@ -290,12 +434,25 @@ const confirmRecover = async () => {
             <a href="#items">Browse Items</a>
           </div>
 
-          <button
-  className="login-btn"
-  onClick={() => setShowLogin(true)}
->
-  Login
-</button>
+{user ? (
+  <button
+    className="login-btn"
+    onClick={handleLogout}
+  >
+    👤 {user.user_metadata?.full_name || "Account"} · Logout
+  </button>
+) : (
+  <button
+    className="login-btn"
+    onClick={() => {
+      setShowLogin(true);
+      setShowRegister(false);
+      setAuthMessage("");
+    }}
+  >
+    Login
+  </button>
+)}
         </div>
       </nav>
 
@@ -697,13 +854,13 @@ const confirmRecover = async () => {
 
         <div className="footer-content">
 
-          <div>
-            <strong>🔎 CampusFind AI</strong>
+<div>
+  <strong>🔎 CampusFind AI</strong>
 
-            <p>
-              Making campus life a little easier.
-            </p>
-          </div>
+  <p>
+    Designed & developed by <strong>Allen Joseph</strong>
+  </p>
+</div>
 
           <div className="backend-status">
 
@@ -1233,135 +1390,210 @@ const confirmRecover = async () => {
 
         </div>
       )}
-{showLogin && (
-  <div className="login-page">
 
-    <div className="login-container">
+      {/* LOGIN / REGISTER */}
+      {showLogin && (
+        <div className="login-page">
+          <div className="login-container">
+            <button
+              className="login-close"
+              onClick={() => {
+                setShowLogin(false);
+                setShowRegister(false);
+                setAuthMessage("");
+              }}
+            >
+              ×
+            </button>
 
-      <button
-        className="login-close"
-        onClick={() => setShowLogin(false)}
-      >
-        ×
-      </button>
+            <div className="login-logo">🔎</div>
 
-      <div className="login-logo">
-        🔎
-      </div>
+            <div className="login-brand">
+              <h1>CHRIST</h1>
+              <p>Deemed to be University</p>
+            </div>
 
-      <div className="login-brand">
-        <h1>CHRIST</h1>
-        <p>Deemed to be University</p>
-      </div>
+            {showRegister ? (
+              <>
+                <div className="login-heading">
+                  <h2>Create account ✨</h2>
+                  <p>Join CHRIST Lost & Found</p>
+                </div>
 
-      <div className="login-heading">
-        <h2>Welcome back 👋</h2>
-        <p>
-          Login to continue to CHRIST Lost & Found
-        </p>
-      </div>
+                <form className="login-form" onSubmit={handleRegister}>
+                  <label>Full Name</label>
 
-<form
-  className="login-form"
-  onSubmit={handleLogin}
->
+                  <div className="login-input">
+                    <span>👤</span>
+                    <input
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={registerName}
+                      onChange={(e) => setRegisterName(e.target.value)}
+                      required
+                    />
+                  </div>
 
-        <label>
-          University Email
-        </label>
+                  <label>University Email</label>
 
-        <div className="login-input">
-          <span>📧</span>
+                  <div className="login-input">
+                    <span>📧</span>
+                    <input
+                      type="email"
+                      placeholder="yourname@btech.christuniversity.in"
+                      value={registerEmail}
+                      onChange={(e) => setRegisterEmail(e.target.value)}
+                      required
+                    />
+                  </div>
 
-          <input
-            type="email"
-            placeholder="Enter your university email"
-            required
-          />
+                  <label>Password</label>
+
+                  <div className="login-input">
+                    <span>🔒</span>
+                    <input
+                      type="password"
+                      placeholder="Create a password"
+                      value={registerPassword}
+                      onChange={(e) => setRegisterPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <label>Confirm Password</label>
+
+                  <div className="login-input">
+                    <span>🔒</span>
+                    <input
+                      type="password"
+                      placeholder="Confirm your password"
+                      value={registerConfirmPassword}
+                      onChange={(e) =>
+                        setRegisterConfirmPassword(e.target.value)
+                      }
+                      required
+                    />
+                  </div>
+
+                  {authMessage && (
+                    <div className="auth-message">{authMessage}</div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="login-submit"
+                    disabled={registerLoading}
+                  >
+                    {registerLoading ? "Creating account..." : "Create Account →"}
+                  </button>
+                </form>
+
+                <p className="login-footer">
+                  Already have an account?
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowRegister(false);
+                      setAuthMessage("");
+                    }}
+                  >
+                    Login
+                  </button>
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="login-heading">
+                  <h2>Welcome back 👋</h2>
+                  <p>Login to continue to CHRIST Lost & Found</p>
+                </div>
+
+                <form className="login-form" onSubmit={handleLogin}>
+                  <label>University Email</label>
+
+                  <div className="login-input">
+                    <span>📧</span>
+                    <input
+                      type="email"
+                      placeholder="Enter your university email"
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <label>Password</label>
+
+                  <div className="login-input">
+                    <span>🔒</span>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? "🙈" : "👁️"}
+                    </button>
+                  </div>
+
+                  {authMessage && (
+                    <div className="auth-message">{authMessage}</div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="login-submit"
+                    disabled={authLoading}
+                  >
+                    {authLoading ? "Logging in..." : "Login →"}
+                  </button>
+                </form>
+
+                <div className="login-divider">
+                  <span>OR</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="christ-login"
+                  onClick={() =>
+                    window.open(
+                      "https://christuniversity.in/login/",
+                      "_blank"
+                    )
+                  }
+                >
+                  🎓 Continue with CHRIST
+                </button>
+
+                <p className="login-footer">
+                  Don't have an account?
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowRegister(true);
+                      setAuthMessage("");
+                    }}
+                  >
+                    Create account
+                  </button>
+                </p>
+
+                <div className="login-security">
+                  🔐 Your password is securely handled by Supabase
+                </div>
+              </>
+            )}
+          </div>
         </div>
-
-        <label>
-          Password
-        </label>
-
-        <div className="login-input">
-          <span>🔒</span>
-
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            required
-          />
-
-          <button
-            type="button"
-            className="password-toggle"
-            onClick={() =>
-              setShowPassword(!showPassword)
-            }
-          >
-            {showPassword ? "🙈" : "👁️"}
-          </button>
-        </div>
-
-        <div className="login-options">
-          <label className="remember-me">
-            <input type="checkbox" />
-            <span>Remember me</span>
-          </label>
-
-          <button
-            type="button"
-            className="forgot-password"
-            onClick={() =>
-              alert("Password reset will be connected next.")
-            }
-          >
-            Forgot password?
-          </button>
-        </div>
-
-        <button
-          type="submit"
-          className="login-submit"
-        >
-          Login →
-        </button>
-
-      </form>
-
-      <div className="login-divider">
-        <span>OR</span>
-      </div>
-
-      <button
-        className="christ-login"
-        onClick={() =>
-          alert("CHRIST University login will be connected next.")
-        }
-      >
-        🎓 Continue with CHRIST
-      </button>
-
-      <p className="login-footer">
-        Don't have an account?
-        <button
-          onClick={() =>
-            alert("Registration will be connected next.")
-          }
-        >
-          Create account
-        </button>
-      </p>
-
-      <div className="login-security">
-        🔐 Your information is securely protected
-      </div>
-
-    </div>
-
-  </div>
-)}
+      )}
     </div>
   );
 }
