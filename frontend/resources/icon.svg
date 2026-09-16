@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="180" fill="#FFD400"/>
+
+  <circle
+    cx="512"
+    cy="512"
+    r="425"
+    fill="#fff"
+    stroke="#111"
+    stroke-width="35"
+  />
+
+  <!-- Backpack -->
+  <rect
+    x="335"
+    y="230"
+    width="354"
+    height="350"
+    rx="65"
+    fill="#111"
+  />
+
+  <path
+    d="M430 235 C430 155 594 155 594 235"
+    fill="none"
+    stroke="#111"
+    stroke-width="45"
+    stroke-linecap="round"
+  />
+
+  <!-- Magnifying glass -->
+  <circle
+    cx="505"
+    cy="390"
+    r="115"
+    fill="none"
+    stroke="#fff"
+    stroke-width="35"
+  />
+
+  <line
+    x1="590"
+    y1="475"
+    x2="670"
+    y2="555"
+    stroke="#fff"
+    stroke-width="38"
+    stroke-linecap="round"
+  />
+
+  <!-- Location pin -->
+  <path
+    d="M505 315
+       C455 315 420 350 420 400
+       C420 465 505 535 505 535
+       C505 535 590 465 590 400
+       C590 350 555 315 505 315Z"
+    fill="#FFD400"
+  />
+
+  <circle cx="505" cy="395" r="25" fill="#111"/>
+
+  <!-- LOST AND -->
+  <text
+    x="512"
+    y="670"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="105"
+    font-weight="900"
+    fill="#111">
+    LOST AND
+  </text>
+
+  <!-- FOUND -->
+  <rect
+    x="260"
+    y="705"
+    width="504"
+    height="125"
+    rx="20"
+    fill="#111"
+  />
+
+  <text
+    x="512"
+    y="795"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="92"
+    font-weight="900"
+    fill="#FFD400">
+    FOUND
+  </text>
+
+  <!-- Tagline -->
+  <text
+    x="512"
+    y="875"
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="30"
+    font-weight="700"
+    letter-spacing="5"
+    fill="#111">
+    CAMPUS • COMMUNITY
+  </text>
+</svg>

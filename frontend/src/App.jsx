@@ -416,17 +416,21 @@ setSubmitted(true);
       <nav className="navbar">
         <div className="nav-container">
 
-          <div className="brand">
-            <div className="brand-icon">🔎</div>
+<div className="brand">
+  <img
+    src="/campusfind-logo.svg"
+    alt="CampusFind AI"
+    className="campusfind-logo"
+  />
 
-            <div>
-              <div className="brand-name">CHRIST</div>
+  <div>
+    <div className="brand-name">CHRIST</div>
 
-              <div className="brand-ai">
-                Deemed to be University
-              </div>
-            </div>
-          </div>
+    <div className="brand-ai">
+      Deemed to be University
+    </div>
+  </div>
+</div>
 
           <div className="nav-links">
             <a href="#home">Home</a>
@@ -1406,7 +1410,12 @@ setSubmitted(true);
               ×
             </button>
 
-            <div className="login-logo">🔎</div>
+<div className="logo">
+  <img
+    src="/campusfind-logo.svg"
+    alt="CampusFind AI"
+  />
+</div>
 
             <div className="login-brand">
               <h1>CHRIST</h1>
