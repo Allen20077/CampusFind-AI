@@ -1626,34 +1626,121 @@ footer {
         height: 52px;
         border-radius: 10px;
     }
-}.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .download-nav-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 54px;
-  padding: 0 22px;
-  border: 1px solid #d9dee5;
-  border-radius: 14px;
-  background: #ffffff;
-  color: #111111;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    padding: 0 22px;
+    border: 1px solid #d9dee5;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #111111;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
 }
 
 .download-nav-button:hover {
-  background: #f7f7f7;
-  transform: translateY(-1px);
+    background: #f7f7f7;
+    transform: translateY(-1px);
 }
 
 .download-nav-button:active {
-  transform: scale(0.98);
+    transform: scale(0.98);
+}
+
+
+/* PHOTO OPTIONS */
+
+.photo-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.photo-option {
+    min-height: 64px;
+    border: 1px solid #d9dee5;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #111111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.photo-option:hover {
+    background: #f7f7f7;
+    transform: translateY(-1px);
+}
+
+.photo-option:active {
+    transform: scale(0.98);
+}
+
+.photo-option-icon {
+    font-size: 22px;
+}
+
+
+/* SELECTED PHOTO */
+
+.selected-photo {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid #e1e5ea;
+    border-radius: 14px;
+    background: #fafafa;
+}
+
+.selected-photo img {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.selected-photo-name {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+    .photo-options {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .photo-option {
+        min-height: 58px;
+        font-size: 14px;
+    }
+    .photo-option-icon {
+        font-size: 20px;
+    }
 }

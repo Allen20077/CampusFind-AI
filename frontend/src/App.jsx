@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "./supabase";
 import "./App.css";
 
@@ -40,6 +40,8 @@ const [authMessage, setAuthMessage] = useState("");
   });
 
   const [photo, setPhoto] = useState(null);
+  const cameraInputRef = useRef(null);
+const fileInputRef = useRef(null);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 useEffect(() => {
@@ -1307,23 +1309,84 @@ setSubmitted(true);
                 </div>
 
 
-                {/* PHOTO */}
+{/* PHOTO */}
 
-                <div className="form-group">
+<div className="form-group">
 
-                  <label>
-                    Item Photo
-                  </label>
+  <label>
+    Item Photo
+  </label>
 
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) =>
-                      setPhoto(e.target.files[0])
-                    }
-                  />
+  <div className="photo-options">
 
-                </div>
+    {/* CAMERA */}
+    <button
+      type="button"
+      className="photo-option camera-option"
+      onClick={() => cameraInputRef.current?.click()}
+    >
+      <span className="photo-option-icon">📷</span>
+      <span>Take Photo</span>
+    </button>
+
+    {/* CHOOSE FILE */}
+    <button
+      type="button"
+      className="photo-option file-option"
+      onClick={() => fileInputRef.current?.click()}
+    >
+      <span className="photo-option-icon">📁</span>
+      <span>Choose File</span>
+    </button>
+
+  </div>
+
+  {/* CAMERA INPUT */}
+  <input
+    ref={cameraInputRef}
+    type="file"
+    accept="image/*"
+    capture="environment"
+    hidden
+    onChange={(e) => {
+      const selectedFile = e.target.files?.[0];
+      if (selectedFile) {
+        setPhoto(selectedFile);
+      }
+    }}
+  />
+
+  {/* FILE/GALLERY INPUT */}
+  <input
+    ref={fileInputRef}
+    type="file"
+    accept="image/*"
+    hidden
+    onChange={(e) => {
+      const selectedFile = e.target.files?.[0];
+      if (selectedFile) {
+        setPhoto(selectedFile);
+      }
+    }}
+  />
+
+  {/* SELECTED PHOTO */}
+  {photo && (
+    <div className="selected-photo">
+
+      <img
+        src={URL.createObjectURL(photo)}
+        alt="Selected item"
+      />
+
+      <div className="selected-photo-name">
+        {photo.name}
+      </div>
+
+    </div>
+  )}
+
+</div>
 
 
                 {/* CONTACT */}
