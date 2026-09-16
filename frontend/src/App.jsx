@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+const ADMIN_EMAIL = "joseph.allen@btech.christuniversity.in";
 import { supabase } from "./supabase";
 import "./App.css";
 
@@ -16,6 +17,11 @@ const [searchQuery, setSearchQuery] = useState("");
   const [showRecoverConfirm, setShowRecoverConfirm] = useState(false);
 const [recoverReportId, setRecoverReportId] = useState(null);
   const [user, setUser] = useState(null);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [adminSearchQuery, setAdminSearchQuery] = useState("");
+const [showAdminDeleteConfirm, setShowAdminDeleteConfirm] = useState(false);
+const [adminDeleteReportId, setAdminDeleteReportId] = useState(null);
+const [adminLoading, setAdminLoading] = useState(false);
 const [showRegister, setShowRegister] = useState(false);
 
 const [registerName, setRegisterName] = useState("");
@@ -166,8 +172,19 @@ data.append("date", formData.date);
 data.append("time", formData.time);
 data.append("description", formData.description);
 data.append("contact", formData.contact);
+
 if (user) {
   data.append("user_id", user.id);
+
+  data.append(
+    "user_name",
+    user.user_metadata?.full_name || ""
+  );
+
+  data.append(
+    "user_email",
+    user.email || ""
+  );
 }
 
 if (photo) {
@@ -235,7 +252,9 @@ setSubmitted(true);
   };
   const myReports = reports.filter(
   (report) => report.user_id === user?.id
-);
+  );
+  const isAdmin =
+  user?.email?.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
 const myLostReports = myReports.filter(
   (report) => report.type === "lost"
@@ -257,7 +276,42 @@ const myRejectedReports = myReports.filter(
     ? myLostReports
     : dashboardFilter === "found"
     ? myFoundReports
-    : myReports;
+        : myReports;
+  const adminReports = reports.filter((report) => {
+  const query = adminSearchQuery.trim().toLowerCase();
+
+  if (!query) {
+    return true;
+  }
+
+  return (
+    report.item_name?.toLowerCase().includes(query) ||
+    report.category?.toLowerCase().includes(query) ||
+    report.location?.toLowerCase().includes(query) ||
+    report.type?.toLowerCase().includes(query) ||
+    report.status?.toLowerCase().includes(query) ||
+    report.contact?.toLowerCase().includes(query) ||
+    report.user_id?.toLowerCase().includes(query)
+  );
+});
+
+const adminTotalReports = reports.length;
+
+const adminLostReports = reports.filter(
+  (report) => report.type === "lost"
+);
+
+const adminFoundReports = reports.filter(
+  (report) => report.type === "found"
+);
+
+const adminActiveReports = reports.filter(
+  (report) => report.status === "active"
+);
+
+const adminRecoveredReports = reports.filter(
+  (report) => report.status === "recovered"
+);
 
   const filteredReports = reports.filter((report) => {
     if (report.status !== "active") {
@@ -281,6 +335,67 @@ const myRejectedReports = myReports.filter(
     setRecoverReportId(reportId);
     setShowRecoverConfirm(true);
   };
+
+  const handleAdminDelete = async () => {
+    if (!adminDeleteReportId) {
+  return;
+}
+  if (!adminDeleteReportId) {
+    return;
+    }
+    const API_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
+    setAdminLoading(true);
+    const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+if (!session?.access_token) {
+  throw new Error("Your session has expired. Please log in again.");
+}
+
+    try {
+    if (!isAdmin) {
+      throw new Error("You are not authorized to perform this action.");
+    }
+
+    const response = await fetch(
+      `${API_URL}/api/reports/${adminDeleteReportId}`,
+{
+  method: "DELETE",
+  headers: {
+    Authorization: `Bearer ${session.access_token}`,
+  },
+}
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.detail || "Failed to delete the report."
+      );
+    }
+
+    setReports((previousReports) =>
+      previousReports.filter(
+        (report) => report.id !== adminDeleteReportId
+      )
+    );
+
+    setShowAdminDeleteConfirm(false);
+    setAdminDeleteReportId(null);
+  } catch (error) {
+    console.error("ADMIN DELETE ERROR:", error);
+    alert(
+      error.message ||
+      "Failed to delete the report."
+    );
+  } finally {
+    setAdminLoading(false);
+  }
+};
 
   const confirmRecover = async () => {
     if (!recoverReportId) return;
@@ -465,10 +580,43 @@ const myRejectedReports = myReports.filter(
 </div>
 
 <div className="nav-links">
-  <a href="#home">Home</a>
+<a
+  href="#home"
+  onClick={(e) => {
+    e.preventDefault();
+    setShowDashboard(false);
+    setShowAdminDashboard(false);
+    window.location.hash = "home";
+  }}
+>
+  Home
+</a>
   <a href="#how-it-works">How It Works</a>
-  <a href="#items">Browse Items</a>
-
+<a
+  href="#items"
+  onClick={(e) => {
+    e.preventDefault();
+    setShowDashboard(false);
+    setShowAdminDashboard(false);
+    document.getElementById("items")?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }}
+>
+  Browse Items
+</a>
+{isAdmin && (
+  <a
+    href="#admin-dashboard"
+    onClick={(e) => {
+      e.preventDefault();
+      setShowAdminDashboard(true);
+      setShowDashboard(false);
+    }}
+  >
+    Admin Dashboard
+  </a>
+)}
   {user && (
     <a
       href="#dashboard"
@@ -593,11 +741,9 @@ const myRejectedReports = myReports.filter(
 
         <div className="dashboard-grid">
 
-          {reports.filter(
-            (report) => report.user_id === user?.id
-          ).length > 0 ? (
+{reports.filter((report) => report.status === "active").length > 0 ? (
 
-dashboardReports.map((report) => (
+            dashboardReports.map((report) => (
 
                 <button
                   key={report.id}
@@ -649,53 +795,297 @@ dashboardReports.map((report) => (
     </span>
   )}
 
-  {report.status === "rejected" && (
-    <span className="status-rejected">
-      🔴 Rejected
-    </span>
-  )}
-
-  {report.status === "recovered" && (
-    <span className="status-recovered">
-      ✅ Recovered
-    </span>
-  )}
-</div>
-
-                  </div>
-
-                </button>
-
-              ))
-
-          ) : (
-
-            <div className="dashboard-empty">
-
-              <div>📦</div>
-
-              <h3>No reports yet</h3>
-
-              <p>
-                Reports you create will appear here.
-              </p>
-
-            </div>
-
-          )}
-
+        
         </div>
 
       </div>
 
+                </button>
+              ))) : (
+                <div className="dashboard-empty">
+                  <p>No reports found.</p>
+                </div>
+              )}
+
     </div>
+
+  </div>
+
+  </div>
 
   </div>
 )}
 
+      {showAdminDashboard && isAdmin && (
+        <div className="admin-page">
 
+        {adminReports.length > 0 ? (
+
+          <div className="admin-report-list">
+
+            {adminReports.map((report) => {
+
+              const imageUrl = report.photo_path
+                ? `https://swrrvlsrpdeiculvzkqy.supabase.co/storage/v1/object/public/lost-found/${report.photo_path}`
+                : null;
+
+              return (
+                <div
+                  className="admin-report-card"
+                  key={report.id}
+                >
+
+                  <div className="admin-report-image">
+
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={report.item_name}
+                      />
+                    ) : (
+                      <div className="admin-no-image">
+                        📷
+                        <span>No Photo</span>
+                      </div>
+                    )}
+
+                  </div>
+
+                  <div className="admin-report-content">
+
+                    <div className="admin-report-top">
+
+                      <div>
+
+                        <span
+                          className={
+                            report.type === "lost"
+                              ? "admin-type-lost"
+                              : "admin-type-found"
+                          }
+                        >
+                          {report.type === "lost"
+                            ? "LOST"
+                            : "FOUND"}
+                        </span>
+
+                        <h3>
+                          {report.item_name}
+                        </h3>
+
+                      </div>
+
+                      <div className="admin-status">
+
+                        {report.status === "active" && (
+                          <span className="status-active">
+                            🟢 Active
+                          </span>
+                        )}
+
+                        {report.status === "recovered" && (
+                          <span className="status-recovered">
+                            ✅ Recovered
+                          </span>
+                        )}
+
+                        {report.status === "rejected" && (
+                          <span className="status-rejected">
+                            🔴 Rejected
+                          </span>
+                        )}
+
+                      </div>
+
+                    </div>
+
+                    <div className="admin-report-details">
+
+                      <div>
+                        <span>📂 Category</span>
+                        <strong>
+                          {report.category}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>🎨 Colour</span>
+                        <strong>
+                          {report.colour}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>📍 Location</span>
+                        <strong>
+                          {report.location}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span>📅 Date</span>
+                        <strong>
+                          {report.date}
+                        </strong>
+                      </div>
+
+                      {report.time && (
+                        <div>
+                          <span>⏰ Time</span>
+                          <strong>
+                            {report.time}
+                          </strong>
+                        </div>
+                      )}
+
+                    </div>
+
+                    <div className="admin-owner">
+
+                      <div className="admin-owner-avatar">
+                        👤
+                      </div>
+
+                      <div>
+                        <span>
+                          Submitted by
+                        </span>
+
+                        <strong>
+                      {report.user_name ||
+  report.user_email ||
+  "Guest / Older Report"}
+                        </strong>
+
+                        <small>
+<small>
+  {report.user_email
+    ? report.user_email
+    : `Contact: ${report.contact}`}
+</small>
+                        </small>
+                      </div>
+
+                    </div>
+
+                    {report.description && (
+                      <div className="admin-description">
+                        <span>Description</span>
+                        <p>
+                          {report.description}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="admin-report-actions">
+
+                      <button
+                        className="admin-delete-button"
+                        onClick={() => {
+                          setAdminDeleteReportId(
+                            report.id
+                          );
+                          setShowAdminDeleteConfirm(
+                            true
+                          );
+                        }}
+                      >
+                        🗑️ Delete Permanently
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </div>
+              );
+            })}
+
+          </div>
+
+        ) : (
+
+          <div className="admin-empty">
+            <div>🔎</div>
+
+            <h3>No reports found</h3>
+
+            <p>
+              No reports match your search.
+            </p>
+          </div>
+
+        )}
+
+      </div>
+)}
+
+{showAdminDeleteConfirm && (
+  <div
+    style={{
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.6)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 9999,
+    }}
+  >
+    <div
+      style={{
+        background: "white",
+        padding: "30px",
+        borderRadius: "16px",
+        width: "400px",
+        maxWidth: "90%",
+        textAlign: "center",
+      }}
+    >
+      <h2>Delete Report?</h2>
+
+      <p>
+        Are you sure you want to permanently delete this report?
+        This action cannot be undone.
+      </p>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          justifyContent: "center",
+          marginTop: "20px",
+        }}
+      >
+        <button
+          onClick={() => {
+            setShowAdminDeleteConfirm(false);
+            setAdminDeleteReportId(null);
+          }}
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleAdminDelete}
+          disabled={adminLoading}
+          style={{
+            background: "#dc2626",
+            color: "white",
+            border: "none",
+            padding: "10px 18px",
+            borderRadius: "8px",
+            cursor: "pointer",
+          }}
+        >
+          {adminLoading ? "Deleting..." : "Yes, Delete Permanently"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {/* HERO */}
-      {!showDashboard && (
+{!showDashboard && !showAdminDashboard && (
   <main id="home">
 
         <section className="hero">
@@ -1088,9 +1478,8 @@ dashboardReports.map((report) => (
   )}
 
       {/* FOOTER */}
-      {!showDashboard && (
+{!showDashboard && !showAdminDashboard && (
   <footer>
-
         <div className="footer-content">
 
 <div>

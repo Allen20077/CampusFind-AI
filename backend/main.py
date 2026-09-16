@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from dotenv import load_dotenv
@@ -18,6 +18,7 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 SUPABASE_BUCKET = os.getenv("SUPABASE_BUCKET", "lost-found")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "").strip().lower()
 
 
 # =========================================================
@@ -116,6 +117,8 @@ async def create_report(
     description: str = Form(...),
     contact: str = Form(...),
     user_id: str = Form(None),
+user_name: str = Form(None),
+user_email: str = Form(None),
     photo: Optional[UploadFile] = File(None),
     
 ):
@@ -246,6 +249,8 @@ async def create_report(
             "photo_path": photo_path,
             "status": "active",
             "user_id": user_id,
+            "user_name": user_name,
+"user_email": user_email,
         }
 
 
@@ -362,7 +367,193 @@ def get_reports():
 # MARK REPORT AS RECOVERED + DELETE PHOTO
 # =========================================================
 
-@app.patch("/api/reports/{report_id}/recover")
+@app.delete("/api/reports/{report_id}")
+def delete_report(
+    report_id: str,
+    authorization: str = Header(None)
+):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required"
+        )
+
+    access_token = authorization.replace("Bearer ", "", 1).strip()
+
+    try:
+        user_response = supabase.auth.get_user(access_token)
+        current_user = user_response.user
+
+        if not current_user:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid authentication"
+            )
+
+        current_email = (current_user.email or "").lower()
+
+        if not ADMIN_EMAIL or current_email != ADMIN_EMAIL:
+            raise HTTPException(
+                status_code=403,
+                detail="Admin access required"
+            )
+
+    except HTTPException:
+        raise
+    except Exception as error:
+        print("ADMIN AUTH ERROR:", error)
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication failed"
+        )
+
+    try:
+        result = (
+            supabase
+            .table("reports")
+            .select("photo_path")
+            .eq("id", report_id)
+            .single()
+            .execute()
+        )
+
+        report = result.data
+
+        if not report:
+            raise HTTPException(
+                status_code=404,
+                detail="Report not found"
+            )
+
+        photo_path = report.get("photo_path")
+
+        if photo_path:
+            try:
+                storage_url = (
+                    f"{SUPABASE_URL}/storage/v1/object/"
+                    f"{SUPABASE_BUCKET}/{photo_path}"
+                )
+
+                requests.delete(
+                    storage_url,
+                    headers={
+                        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}"
+                    },
+                    timeout=20
+                )
+            except Exception as error:
+                print("PHOTO DELETE ERROR:", error)
+
+        (
+            supabase
+            .table("reports")
+            .delete()
+            .eq("id", report_id)
+            .execute()
+        )
+
+        return {
+            "success": True,
+            "message": "Report deleted successfully"
+        }
+
+    except HTTPException:
+        raise
+    except Exception as error:
+        print("DELETE ERROR:", error)
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete report"
+        )
+    try:
+        report_result = (
+            supabase
+            .table("reports")
+            .select("*")
+            .eq("id", report_id)
+            .execute()
+        )
+
+        if not report_result.data:
+            raise HTTPException(
+                status_code=404,
+                detail="Report not found."
+            )
+
+        report = report_result.data[0]
+
+        photo_path = report.get("photo_path")
+
+        # Delete photo from Supabase Storage
+        if photo_path:
+            storage_url = (
+                f"{SUPABASE_URL.rstrip('/')}/storage/v1/object/"
+                f"{SUPABASE_BUCKET}/{photo_path.lstrip('/')}"
+            )
+
+            headers = {
+                "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+                "apikey": SUPABASE_SERVICE_ROLE_KEY,
+            }
+
+            delete_photo_response = requests.delete(
+                storage_url,
+                headers=headers,
+                timeout=60,
+            )
+
+            print(
+                "ADMIN PHOTO DELETE STATUS:",
+                delete_photo_response.status_code
+            )
+
+            if not delete_photo_response.ok:
+                print(
+                    "ADMIN PHOTO DELETE ERROR:",
+                    delete_photo_response.text
+                )
+
+                raise HTTPException(
+                    status_code=500,
+                    detail="Failed to delete report photo."
+                )
+
+            print(
+                f"ADMIN PHOTO DELETED: {photo_path}"
+            )
+
+        # Delete report from database
+        delete_result = (
+            supabase
+            .table("reports")
+            .delete()
+            .eq("id", report_id)
+            .execute()
+        )
+
+        if not delete_result.data:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to delete report."
+            )
+
+        return {
+            "success": True,
+            "message": "Report permanently deleted."
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        print("ADMIN DELETE REPORT ERROR:")
+        print(repr(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to delete report: {str(e)}"
+        )
+        
 def recover_report(report_id: str):
     try:
 

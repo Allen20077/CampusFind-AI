@@ -2017,3 +2017,564 @@ footer {
     color: #555;
     font-weight: 600;
 }
+
+
+/* ==========================================
+   ADMIN DASHBOARD
+========================================== */
+
+.admin-page {
+    min-height: 100vh;
+    background: #f7f7f4;
+    padding: 110px 24px 80px;
+}
+
+.admin-container {
+    max-width: 1250px;
+    margin: 0 auto;
+}
+
+.admin-back {
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 0;
+    margin-bottom: 35px;
+}
+
+.admin-header {
+    margin-bottom: 28px;
+}
+
+.admin-header .section-label {
+    color: #d71920;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    font-size: 12px;
+}
+
+.admin-header h1 {
+    margin: 8px 0 8px;
+    font-size: clamp(36px, 5vw, 58px);
+    line-height: 1;
+}
+
+.admin-header p {
+    color: #666;
+    margin: 0;
+    font-size: 16px;
+}
+
+.admin-user-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 18px 20px;
+    margin-bottom: 28px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+}
+
+.admin-user-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #111;
+    color: white;
+    font-size: 21px;
+}
+
+.admin-user-card strong {
+    display: block;
+    font-size: 15px;
+}
+
+.admin-user-card p {
+    margin: 4px 0 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 40px;
+}
+
+.admin-stat {
+    text-align: left;
+    border: 1px solid #e5e5e5;
+    border-radius: 18px;
+    padding: 22px;
+    background: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-stat:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.admin-stat strong {
+    display: block;
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+
+.admin-stat span {
+    color: #666;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.admin-total {
+    border-top: 4px solid #16803c;
+}
+
+.admin-total strong {
+    color: #16803c;
+}
+
+.admin-lost {
+    border-top: 4px solid #d71920;
+}
+
+.admin-lost strong {
+    color: #d71920;
+}
+
+.admin-found {
+    border-top: 4px solid #16803c;
+}
+
+.admin-found strong {
+    color: #16803c;
+}
+
+.admin-active {
+    border-top: 4px solid #16803c;
+}
+
+.admin-active strong {
+    color: #16803c;
+}
+
+.admin-recovered {
+    border-top: 4px solid #16803c;
+}
+
+.admin-recovered strong {
+    color: #16803c;
+}
+
+.admin-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-section-heading h2 {
+    margin: 0 0 5px;
+    font-size: 28px;
+}
+
+.admin-section-heading p {
+    margin: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.admin-report-count {
+    background: #111;
+    color: white;
+    padding: 8px 13px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.admin-search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 0 16px;
+    height: 52px;
+    margin-bottom: 22px;
+}
+
+.admin-search-box span {
+    font-size: 17px;
+}
+
+.admin-search-box input {
+    border: none;
+    outline: none;
+    flex: 1;
+    background: transparent;
+    font-size: 14px;
+}
+
+.admin-search-box button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.admin-report-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.admin-report-card {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.04);
+}
+
+.admin-report-image {
+    min-height: 250px;
+    background: #f0f0ec;
+}
+
+.admin-report-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+    object-fit: cover;
+    display: block;
+}
+
+.admin-no-image {
+    height: 100%;
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    gap: 8px;
+    font-size: 25px;
+}
+
+.admin-no-image span {
+    font-size: 12px;
+}
+
+.admin-report-content {
+    padding: 22px;
+}
+
+.admin-report-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-report-top h3 {
+    margin: 7px 0 0;
+    font-size: 23px;
+}
+
+.admin-type-lost,
+.admin-type-found {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 5px 8px;
+    border-radius: 5px;
+}
+
+.admin-type-lost {
+    color: #d71920;
+    background: #fff0f0;
+}
+
+.admin-type-found {
+    color: #16803c;
+    background: #edf8f0;
+}
+
+.admin-status {
+    white-space: nowrap;
+}
+
+.status-active,
+.status-recovered,
+.status-rejected {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 10px;
+    border-radius: 999px;
+}
+
+.status-active {
+    background: #edf8f0;
+    color: #16803c;
+}
+
+.status-recovered {
+    background: #edf8f0;
+    color: #16803c;
+}
+
+.status-rejected {
+    background: #fff0f0;
+    color: #d71920;
+}
+
+.admin-report-details {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 16px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-report-details div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.admin-report-details span {
+    color: #888;
+    font-size: 11px;
+}
+
+.admin-report-details strong {
+    font-size: 13px;
+}
+
+.admin-owner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 17px;
+}
+
+.admin-owner-avatar {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f1ee;
+    border-radius: 50%;
+}
+
+.admin-owner div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.admin-owner span {
+    font-size: 10px;
+    color: #888;
+}
+
+.admin-owner strong {
+    font-size: 13px;
+}
+
+.admin-owner small {
+    font-size: 11px;
+    color: #777;
+}
+
+.admin-description {
+    margin-top: 15px;
+    background: #f7f7f4;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.admin-description span {
+    font-size: 10px;
+    font-weight: 700;
+    color: #777;
+}
+
+.admin-description p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+}
+
+.admin-report-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 18px;
+}
+
+.admin-delete-button {
+    border: none;
+    background: #fff0f0;
+    color: #d71920;
+    border-radius: 10px;
+    padding: 10px 15px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.admin-delete-button:hover {
+    background: #d71920;
+    color: white;
+}
+
+.admin-empty {
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 20px;
+    text-align: center;
+    padding: 70px 20px;
+}
+
+.admin-empty div {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+.admin-empty h3 {
+    margin: 0 0 6px;
+}
+
+.admin-empty p {
+    margin: 0;
+    color: #777;
+}
+
+
+/* ADMIN DELETE MODAL */
+
+.confirm-modal {
+    max-width: 430px;
+}
+
+.confirm-icon {
+    width: 55px;
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff0f0;
+    border-radius: 50%;
+    font-size: 23px;
+    margin-bottom: 15px;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.cancel-button,
+.delete-confirm-button {
+    border: none;
+    border-radius: 10px;
+    padding: 11px 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background: #eee;
+    color: #333;
+}
+
+.delete-confirm-button {
+    background: #d71920;
+    color: white;
+}
+
+.delete-confirm-button:disabled,
+.cancel-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* ==========================================
+   ADMIN MOBILE
+========================================== */
+
+@media (max-width: 1000px) {
+    .admin-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .admin-report-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .admin-page {
+        padding: 95px 15px 50px;
+    }
+    .admin-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .admin-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .admin-report-card {
+        grid-template-columns: 1fr;
+    }
+    .admin-report-image,
+    .admin-report-image img {
+        min-height: 220px;
+        height: 220px;
+    }
+    .admin-report-top {
+        flex-direction: column;
+    }
+    .admin-status {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-stats {
+        grid-template-columns: 1fr;
+    }
+    .admin-report-details {
+        grid-template-columns: 1fr;
+    }
+    .admin-report-content {
+        padding: 17px;
+    }
+    .admin-search-box {
+        height: 48px;
+    }
+}
