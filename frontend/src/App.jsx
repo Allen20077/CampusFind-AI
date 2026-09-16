@@ -397,46 +397,56 @@ if (!session?.access_token) {
   }
 };
 
-  const confirmRecover = async () => {
-    if (!recoverReportId) return;
+const confirmRecover = async () => {
+  if (!recoverReportId) return;
 
-    try {
-      const API_URL =
-        import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+  const API_URL =
+    import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
-      const response = await fetch(
-        `${API_URL}/api/reports/${recoverReportId}/recover`,
-        {
-          method: "PATCH",
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          result.detail || "Failed to mark item as recovered."
-        );
+  try {
+    const response = await fetch(
+      `${API_URL}/api/reports/${recoverReportId}/recover`,
+      {
+        method: "PATCH",
       }
+    );
 
-      console.log("ITEM RECOVERED:", result);
+    const result = await response.json();
 
-      setReports((previousReports) =>
-        previousReports.filter(
-          (report) => report.id !== recoverReportId
-        )
-      );
-
-      setSelectedReport(null);
-      setShowRecoverConfirm(false);
-      setRecoverReportId(null);
-    } catch (error) {
-      console.error("RECOVER ERROR:", error);
-      window.alert(
-        error.message || "Failed to mark item as recovered."
+    if (!response.ok) {
+      throw new Error(
+        result.detail || "Failed to mark item as recovered."
       );
     }
-  };
+
+    console.log("ITEM RECOVERED:", result);
+
+    // Keep the report in My Dashboard,
+    // but mark it as recovered and remove its photo reference.
+    setReports((previousReports) =>
+      previousReports.map((report) =>
+        report.id === recoverReportId
+          ? {
+              ...report,
+              status: "recovered",
+              photo_path: null,
+            }
+          : report
+      )
+    );
+
+    setSelectedReport(null);
+    setShowRecoverConfirm(false);
+    setRecoverReportId(null);
+
+  } catch (error) {
+    console.error("RECOVER ERROR:", error);
+
+    window.alert(
+      error.message || "Failed to mark item as recovered."
+    );
+  }
+};
 
   const handleLogin = async (e) => {
   e.preventDefault();
