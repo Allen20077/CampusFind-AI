@@ -180,9 +180,7 @@ user_email: str = Form(None),
             print("STORAGE URL:", storage_url)
 
             headers = {
-                "Authorization": (
-                    f"Bearer {SUPABASE_SERVICE_ROLE_KEY}"
-                ),
+                "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
                 "apikey": SUPABASE_SERVICE_ROLE_KEY,
                 "Content-Type": (
                     photo.content_type
@@ -553,7 +551,7 @@ def delete_report(
             status_code=500,
             detail=f"Failed to delete report: {str(e)}"
         )
-        
+@app.patch("/api/reports/{report_id}/recover")
 def recover_report(report_id: str):
     try:
 
