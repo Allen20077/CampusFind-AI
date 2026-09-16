@@ -105,6 +105,7 @@ def test_backend():
 
 @app.post("/api/reports")
 async def create_report(
+    
     type: str = Form(...),
     item_name: str = Form(...),
     category: str = Form(...),
@@ -114,7 +115,9 @@ async def create_report(
     time: Optional[str] = Form(None),
     description: str = Form(...),
     contact: str = Form(...),
+    user_id: str = Form(None),
     photo: Optional[UploadFile] = File(None),
+    
 ):
 
     try:
@@ -242,6 +245,7 @@ async def create_report(
             "contact": contact,
             "photo_path": photo_path,
             "status": "active",
+            "user_id": user_id,
         }
 
 

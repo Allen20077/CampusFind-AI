@@ -6,6 +6,8 @@ function App() {
   const [backendStatus, setBackendStatus] = useState("Checking...");
   const [showForm, setShowForm] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [dashboardFilter, setDashboardFilter] = useState("all");
 const [showPassword, setShowPassword] = useState(false);
   const [reportType, setReportType] = useState("");
   const [reports, setReports] = useState([]);
@@ -164,6 +166,9 @@ data.append("date", formData.date);
 data.append("time", formData.time);
 data.append("description", formData.description);
 data.append("contact", formData.contact);
+if (user) {
+  data.append("user_id", user.id);
+}
 
 if (photo) {
   data.append("photo", photo);
@@ -228,6 +233,31 @@ setSubmitted(true);
       setSubmitting(false);
     }
   };
+  const myReports = reports.filter(
+  (report) => report.user_id === user?.id
+);
+
+const myLostReports = myReports.filter(
+  (report) => report.type === "lost"
+);
+
+const myFoundReports = myReports.filter(
+  (report) => report.type === "found"
+);
+
+const myActiveReports = myReports.filter(
+  (report) => report.status === "active"
+);
+
+const myRejectedReports = myReports.filter(
+  (report) => report.status === "rejected"
+  );
+  const dashboardReports =
+  dashboardFilter === "lost"
+    ? myLostReports
+    : dashboardFilter === "found"
+    ? myFoundReports
+    : myReports;
 
   const filteredReports = reports.filter((report) => {
     if (report.status !== "active") {
@@ -434,13 +464,26 @@ setSubmitted(true);
   </div>
 </div>
 
-          <div className="nav-links">
-            <a href="#home">Home</a>
-            <a href="#how-it-works">How It Works</a>
-            <a href="#items">Browse Items</a>
-          </div>
+<div className="nav-links">
+  <a href="#home">Home</a>
+  <a href="#how-it-works">How It Works</a>
+  <a href="#items">Browse Items</a>
+
+  {user && (
+    <a
+      href="#dashboard"
+      onClick={(e) => {
+        e.preventDefault();
+        setShowDashboard(true);
+      }}
+    >
+      My Dashboard
+    </a>
+  )}
+</div>
 
 <div className="nav-actions">
+
   <a
     href="/app-debug.apk"
     download="app-debug.apk"
@@ -471,10 +514,189 @@ setSubmitted(true);
 </div>
         </div>
       </nav>
+      {showDashboard && (
+  <div className="dashboard-page">
+
+    <div className="dashboard-container">
+
+      <button
+        className="dashboard-back"
+        onClick={() => setShowDashboard(false)}
+      >
+        ← Back to Home
+      </button>
+
+      <div className="dashboard-header">
+        <span className="section-label">
+          MY ACCOUNT
+        </span>
+
+        <h1>My Dashboard</h1>
+
+        <p>
+          Manage the lost and found reports you created.
+        </p>
+      </div>
+
+      <div className="dashboard-user-card">
+        <div className="dashboard-avatar">
+          👤
+        </div>
+
+        <div>
+          <h2>
+            {user?.user_metadata?.full_name || "User"}
+          </h2>
+
+          <p>
+            {user?.email}
+          </p>
+        </div>
+      </div>
+
+<div className="dashboard-stats">
+
+  <button
+    className="dashboard-stat total-stat"
+    onClick={() => setDashboardFilter("all")}
+  >
+    <strong>{myReports.length}</strong>
+    <span>Total Reports</span>
+  </button>
+
+  <button
+    className="dashboard-stat lost-stat"
+    onClick={() => setDashboardFilter("lost")}
+  >
+    <strong>{myLostReports.length}</strong>
+    <span>Lost Reports</span>
+  </button>
+
+  <button
+    className="dashboard-stat found-stat"
+    onClick={() => setDashboardFilter("found")}
+  >
+    <strong>{myFoundReports.length}</strong>
+    <span>Found Reports</span>
+  </button>
+
+</div>
+
+      <div className="dashboard-reports">
+
+        <div className="dashboard-section-title">
+          <h2>My Reports</h2>
+          <p>
+            Reports submitted using your account.
+          </p>
+        </div>
+
+        <div className="dashboard-grid">
+
+          {reports.filter(
+            (report) => report.user_id === user?.id
+          ).length > 0 ? (
+
+dashboardReports.map((report) => (
+
+                <button
+                  key={report.id}
+                  className="dashboard-report-card"
+                  onClick={() => setSelectedReport(report)}
+                >
+
+                  <div className="dashboard-report-image">
+
+                    {report.photo_path ? (
+                      <img
+                        src={`${
+                          import.meta.env.VITE_SUPABASE_URL
+                        }/storage/v1/object/public/lost-found/${report.photo_path}`}
+                        alt={report.item_name}
+                      />
+                    ) : (
+                      <span>📦</span>
+                    )}
+
+                  </div>
+
+                  <div className="dashboard-report-info">
+
+                    <span
+                      className={`item-status ${
+                        report.type === "lost"
+                          ? "lost"
+                          : "found"
+                      }`}
+                    >
+                      {report.type === "lost"
+                        ? "LOST"
+                        : "FOUND"}
+                    </span>
+
+                    <h3>{report.item_name}</h3>
+
+                    <p>📍 {report.location}</p>
+
+                    <small>
+                      {report.date}
+                    </small>
+
+                    <div className="dashboard-report-status">
+  {report.status === "active" && (
+    <span className="status-active">
+      🟢 Active
+    </span>
+  )}
+
+  {report.status === "rejected" && (
+    <span className="status-rejected">
+      🔴 Rejected
+    </span>
+  )}
+
+  {report.status === "recovered" && (
+    <span className="status-recovered">
+      ✅ Recovered
+    </span>
+  )}
+</div>
+
+                  </div>
+
+                </button>
+
+              ))
+
+          ) : (
+
+            <div className="dashboard-empty">
+
+              <div>📦</div>
+
+              <h3>No reports yet</h3>
+
+              <p>
+                Reports you create will appear here.
+              </p>
+
+            </div>
+
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
 
       {/* HERO */}
-      <main id="home">
+      {!showDashboard && (
+  <main id="home">
 
         <section className="hero">
 
@@ -797,7 +1019,7 @@ setSubmitted(true);
   </div>
 
   <div className="items-grid">
-{reports.filter((report) => report.status === "active").length > 0 ? (
+{dashboardReports.length > 0 ? (
   [...reports]
     .filter((report) => report.status === "active")
     .sort((a, b) => {
@@ -863,9 +1085,11 @@ setSubmitted(true);
 </section>
 
       </main>
+  )}
 
       {/* FOOTER */}
-      <footer>
+      {!showDashboard && (
+  <footer>
 
         <div className="footer-content">
 
@@ -892,7 +1116,8 @@ setSubmitted(true);
           </div>
 
         </div>
-      </footer>
+        </footer>
+)}
 {/* ITEM DETAILS POPUP */}
 
 {selectedReport && (
