@@ -1626,4 +1626,34 @@ footer {
         height: 52px;
         border-radius: 10px;
     }
+}.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.download-nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 54px;
+  padding: 0 22px;
+  border: 1px solid #d9dee5;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #111111;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.download-nav-button:hover {
+  background: #f7f7f7;
+  transform: translateY(-1px);
+}
+
+.download-nav-button:active {
+  transform: scale(0.98);
 }

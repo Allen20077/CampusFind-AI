@@ -438,25 +438,35 @@ setSubmitted(true);
             <a href="#items">Browse Items</a>
           </div>
 
-{user ? (
-  <button
-    className="login-btn"
-    onClick={handleLogout}
+<div className="nav-actions">
+  <a
+    href="/app-debug.apk"
+    download="app-debug.apk"
+    className="download-nav-button"
   >
-    👤 {user.user_metadata?.full_name || "Account"} · Logout
-  </button>
-) : (
-  <button
-    className="login-btn"
-    onClick={() => {
-      setShowLogin(true);
-      setShowRegister(false);
-      setAuthMessage("");
-    }}
-  >
-    Login
-  </button>
-)}
+    ↓ Download App
+  </a>
+
+  {user ? (
+    <button
+      className="login-btn"
+      onClick={handleLogout}
+    >
+      👤 {user.user_metadata?.full_name || "Account"} · Logout
+    </button>
+  ) : (
+    <button
+      className="login-btn"
+      onClick={() => {
+        setShowLogin(true);
+        setShowRegister(false);
+        setAuthMessage("");
+      }}
+    >
+      Login
+    </button>
+  )}
+</div>
         </div>
       </nav>
 
@@ -502,7 +512,6 @@ setSubmitted(true);
               </button>
 
             </div>
-
             <div className="trust-text">
               ✨ Simple • Fast • Campus-focused
             </div>
@@ -1399,6 +1408,7 @@ setSubmitted(true);
       {showLogin && (
         <div className="login-page">
           <div className="login-container">
+
             <button
               className="login-close"
               onClick={() => {
