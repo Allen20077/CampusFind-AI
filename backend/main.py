@@ -529,12 +529,6 @@ def delete_report(
             .execute()
         )
 
-        if not delete_result.data:
-            raise HTTPException(
-                status_code=500,
-                detail="Failed to delete report."
-            )
-
         return {
             "success": True,
             "message": "Report permanently deleted."
@@ -551,6 +545,7 @@ def delete_report(
             status_code=500,
             detail=f"Failed to delete report: {str(e)}"
         )
+
 @app.patch("/api/reports/{report_id}/recover")
 def recover_report(report_id: str):
     try:

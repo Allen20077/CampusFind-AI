@@ -378,11 +378,17 @@ if (!session?.access_token) {
       );
     }
 
-    setReports((previousReports) =>
-      previousReports.filter(
-        (report) => report.id !== adminDeleteReportId
-      )
-    );
+setReports((previousReports) =>
+  previousReports.map((report) =>
+    report.id === recoverReportId
+      ? {
+          ...report,
+          status: "recovered",
+          photo_path: null,
+        }
+      : report
+  )
+);
 
     setShowAdminDeleteConfirm(false);
     setAdminDeleteReportId(null);
