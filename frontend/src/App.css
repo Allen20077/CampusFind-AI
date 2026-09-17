@@ -69,72 +69,189 @@ button {
 
 .navbar {
     width: 100%;
-    background: rgba(255, 255, 255, 0.92);
-    border-bottom: 1px solid #edf0f4;
+    height: 82px;
+    background: rgba(255, 255, 255, 0.97);
+    border-top: 3px solid #373151;
+    border-bottom: 1px solid #e7e9ed;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
     backdrop-filter: blur(15px);
 }
 
+
+/* MAIN CONTAINER */
+
 .nav-container {
-    max-width: 1180px;
-    margin: auto;
-    height: 74px;
+    width: 100%;
+    height: 100%;
+    margin: 0;
     padding: 0 25px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    position: relative;
 }
+
+
+/* =========================
+   CHRIST LOGO - FAR LEFT
+========================= */
 
 .brand {
     display: flex;
     align-items: center;
     gap: 10px;
+    position: absolute;
+    left: 25px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-.brand-icon {
-    font-size: 31px;
+.campusfind-logo {
+    width: 62px;
+    height: 62px;
+    object-fit: contain;
+    display: block;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .brand-name {
-    font-size: 20px;
-    font-weight: 750;
-    line-height: 20px;
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 23px;
+    letter-spacing: -0.5px;
+    color: #17191c;
 }
 
 .brand-ai {
+    margin-top: 4px;
     font-size: 12px;
     font-weight: 700;
+    line-height: 15px;
     color: #0b8f55;
 }
 
+
+/* =========================
+   NAVIGATION - TRUE CENTER
+========================= */
+
 .nav-links {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     display: flex;
-    gap: 32px;
+    align-items: center;
+    justify-content: center;
+    gap: 38px;
+    height: 100%;
+    white-space: nowrap;
 }
 
 .nav-links a {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0 3px;
     text-decoration: none;
     color: #555b63;
     font-size: 14px;
-    font-weight: 550;
+    font-weight: 600;
+    transition: 0.2s ease;
 }
 
 .nav-links a:hover {
-    color: #111;
+    color: #373151;
 }
 
-.login-btn {
-    border: 1px solid #dfe3e8;
-    background: white;
-    padding: 10px 20px;
+
+/* underline */
+
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    height: 2px;
     border-radius: 10px;
+    background: #373151;
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+}
+
+.nav-links a:hover::after {
+    transform: scaleX(1);
+}
+
+
+/* =========================
+   RIGHT SIDE
+========================= */
+
+.nav-actions {
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    white-space: nowrap;
+}
+
+
+/* DOWNLOAD */
+
+.download-nav-button {
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 19px;
+    border: 1px solid #d8dce2;
+    border-radius: 11px;
+    background: #ffffff;
+    color: #202327;
+    text-decoration: none;
+    font-size: 14px;
     font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.download-nav-button:hover {
+    background: #f5f6f8;
+    border-color: #bfc4cb;
+    transform: translateY(-1px);
+}
+
+
+/* LOGIN / PROFILE */
+
+.login-btn {
+    min-height: 44px;
+    border: 1px solid #d8dce2;
+    background: #ffffff;
+    padding: 0 18px;
+    border-radius: 11px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #202327;
+    white-space: nowrap;
+    transition: 0.2s ease;
 }
 
 .login-btn:hover {
     background: #f5f6f8;
+    border-color: #bfc4cb;
 }
 
 
@@ -143,17 +260,58 @@ button {
 ========================= */
 
 .hero {
-    max-width: 1180px;
-    margin: auto;
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
     padding: 85px 25px 65px;
     display: grid;
     grid-template-columns: 1.05fr 0.95fr;
     gap: 70px;
     align-items: center;
+    position: relative;
+    isolation: isolate;
+}
+
+
+/* =========================
+   CHRIST CAMPUS BACKGROUND
+========================= */
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/christ-campus.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.85;
+    z-index: -2;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(247, 249, 252, 0.20);
+    z-index: -1;
+}
+
+
+/* White overlay to make the background subtle */
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(247, 249, 252, 0.15);
+    z-index: -1;
 }
 
 .hero-content {
     max-width: 600px;
+    transform: translateY(-100px);
 }
 
 .status-pill {
@@ -161,7 +319,7 @@ button {
     align-items: center;
     gap: 8px;
     background: #e9f8f0;
-    color: #16804a;
+    color: #087F4E;
     padding: 8px 13px;
     border-radius: 30px;
     font-size: 13px;
@@ -181,17 +339,18 @@ button {
     font-size: clamp(45px, 6vw, 70px);
     line-height: 1.04;
     letter-spacing: -3px;
+    color: #111827;
 }
 
 .hero h1 span {
-    color: #16804a;
+    color: #00A86B;
 }
 
 .hero-description {
     max-width: 530px;
     margin-top: 25px;
     margin-bottom: 30px;
-    color: #626871;
+    color: #17211B;
     font-size: 18px;
     line-height: 1.7;
 }
@@ -235,7 +394,7 @@ button {
 .trust-text {
     margin-top: 20px;
     font-size: 13px;
-    color: #858b92;
+    color: #FFFFFF;
 }
 
 
@@ -249,6 +408,7 @@ button {
     border-radius: 22px;
     border: 1px solid #e9edf1;
     box-shadow: 0 25px 70px rgba(30, 40, 50, 0.09);
+    transform: translateY(-100px);
 }
 
 .search-header {
@@ -360,12 +520,17 @@ button {
 
 .stats {
     max-width: 1180px;
-    margin: 0 auto 90px;
-    padding: 30px 25px;
+    margin: -220px auto 0;
+    padding: 25px 25px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    border-top: 1px solid #e6e9ed;
-    border-bottom: 1px solid #e6e9ed;
+    position: relative;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 18px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
 }
 
 .stat {
@@ -393,7 +558,7 @@ button {
 .items-section {
     max-width: 1180px;
     margin: auto;
-    padding: 80px 25px;
+    padding: 140px 25px 80px;
 }
 
 .section-heading {
@@ -592,6 +757,22 @@ footer {
 ========================= */
 
 @media (max-width: 850px) {
+    @media (max-width: 1100px) {
+        .nav-container {
+            grid-template-columns: 280px 1fr auto;
+            column-gap: 15px;
+            padding: 0 20px;
+        }
+        .nav-links {
+            gap: 18px;
+        }
+        .nav-links a {
+            font-size: 13px;
+        }
+        .download-nav-button {
+            padding: 0 14px;
+        }
+    }
     .nav-links {
         display: none;
     }
