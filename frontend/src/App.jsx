@@ -35,7 +35,7 @@ const [loginPassword, setLoginPassword] = useState("");
 
 const [authLoading, setAuthLoading] = useState(false);
 const [authMessage, setAuthMessage] = useState("");
-
+const [otherLocation, setOtherLocation] = useState("");
   const [formData, setFormData] = useState({
     item_name: "",
     category: "",
@@ -129,6 +129,7 @@ useEffect(() => {
       description: "",
       contact: "",
     });
+    setOtherLocation("");
 
     setPhoto(null);
   };
@@ -580,11 +581,11 @@ const confirmRecover = async () => {
         <div className="nav-container">
 
 <div className="brand">
-  <img
-    src="/campusfind-logo.svg"
-    alt="CampusFind AI"
-    className="campusfind-logo"
-  />
+<img
+  src="/christ-logo.png"
+  alt="CHRIST Lost and Found"
+  className="campusfind-logo"
+/>
 
   <div>
     <div className="brand-name">CHRIST</div>
@@ -1824,12 +1825,27 @@ const confirmRecover = async () => {
                     Campus Location *
                   </label>
 
-                  <select
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    required
-                  >
+<select
+  name="location"
+  value={
+    formData.location.startsWith("Other:")
+      ? "Other"
+      : formData.location
+  }
+  onChange={(e) => {
+    const value = e.target.value;
+
+    setFormData({
+      ...formData,
+      location: value,
+    });
+
+    if (value !== "Other") {
+      setOtherLocation("");
+    }
+  }}
+  required
+>
 
                     <option value="">
                       Select location
@@ -1847,17 +1863,29 @@ const confirmRecover = async () => {
                       Main Block
                     </option>
 
-                    <option value="Block A">
-                      Block A
-                    </option>
+<option value="Block 1">
+  Block 1
+</option>
 
-                    <option value="Block B">
-                      Block B
-                    </option>
+<option value="Block 2">
+  Block 2
+</option>
 
-                    <option value="Block C">
-                      Block C
-                    </option>
+<option value="Block 3">
+  Block 3
+</option>
+
+<option value="Block 4">
+  Block 4
+</option>
+
+<option value="Block 5">
+  Block 5
+</option>
+
+<option value="Block 6">
+  Block 6
+</option>
 
                     <option value="Hostel">
                       Hostel
@@ -1874,8 +1902,25 @@ const confirmRecover = async () => {
                     <option value="Other">
                       Other
                     </option>
-
                   </select>
+{formData.location === "Other" && (
+  <input
+    type="text"
+    placeholder="Enter the exact location"
+    value={otherLocation}
+    onChange={(e) => {
+      const value = e.target.value;
+
+      setOtherLocation(value);
+
+      setFormData({
+        ...formData,
+        location: value ? `Other: ${value}` : "Other",
+      });
+    }}
+    required
+  />
+)}
 
                 </div>
 
@@ -2115,7 +2160,7 @@ const confirmRecover = async () => {
 
 <div className="logo">
   <img
-    src="/campusfind-logo.svg"
+    src="/christ-logo.png"
     alt="CampusFind AI"
   />
 </div>

@@ -32,16 +32,18 @@ button {
 /* ============================= */
 
 .campusfind-logo {
-    width: 70px;
-    height: 70px;
+    width: 58px;
+    height: 58px;
     object-fit: contain;
     display: block;
 }
 
 @media (max-width: 600px) {
     .campusfind-logo {
-        width: 58px;
-        height: 58px;
+        width: 52px;
+        height: 52px;
+        object-fit: contain;
+        display: block;
     }
 }
 
