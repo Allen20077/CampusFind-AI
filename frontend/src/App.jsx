@@ -2317,18 +2317,16 @@ const confirmRecover = async () => {
                   <span>OR</span>
                 </div>
 
-                <button
-                  type="button"
-                  className="christ-login"
-                  onClick={() =>
-                    window.open(
-                      "https://christuniversity.in/login/",
-                      "_blank"
-                    )
-                  }
-                >
-                  🎓 Continue with CHRIST
-                </button>
+<button
+  type="button"
+  className="christ-login"
+  onClick={() => {
+    window.location.href =
+      "https://studentespro.christuniversity.in/auth/realms/Student/protocol/openid-connect/auth?client_id=react-app&redirect_uri=https%3A%2F%2Fcue.christuniversity.in%2F&response_type=code&scope=openid+profile+email&state=b2lkYy1zcGEuaMC6sFKA2IzOfA67tkIh&code_challenge=AhScZNR4jlBbJuHvjbd5pSRZtDZujcJZRIJEmAO1bno&code_challenge_method=S256&response_mode=fragment";
+  }}
+>
+  🎓 Continue with CHRIST
+</button>
 
                 <p className="login-footer">
                   Don't have an account?
